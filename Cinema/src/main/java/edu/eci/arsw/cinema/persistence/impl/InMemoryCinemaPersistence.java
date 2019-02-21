@@ -15,11 +15,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author cristian
  */
+@Service
 public class InMemoryCinemaPersistence implements CinemaPersitence{
     
     private final Map<String,Cinema> cinemas=new HashMap<>();
@@ -38,12 +40,24 @@ public class InMemoryCinemaPersistence implements CinemaPersitence{
 
     @Override
     public void buyTicket(int row, int col, String cinema, String date, String movieName) throws CinemaException {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        List<CinemaFunction> temp = getFunctionsbyCinemaAndDate(cinema, date);
+        if (temp.isEmpty()) throw new CinemaException("Can't fine " + cinema +" "+ date);
+        for (CinemaFunction cfuncions : temp) {            
+            if (cfuncions.getMovie().getName().equals(movieName))
+                cfuncions.buyTicket(row, col);
+        }
+        
     }
 
     @Override
     public List<CinemaFunction> getFunctionsbyCinemaAndDate(String cinema, String date) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        List<CinemaFunction> temp = new ArrayList<>();
+        Cinema Ctemp = cinemas.get(cinema);
+        for (CinemaFunction cf : Ctemp.getFunctions()){
+            if (cf.getDate().equals(date))
+                temp.add(cf);
+        }        
+        return temp;
     }
 
     @Override
@@ -61,4 +75,9 @@ public class InMemoryCinemaPersistence implements CinemaPersitence{
         return cinemas.get(name);
     }
 
+    @Override
+    public Map<String, Cinema> getAllCinemas() {
+        return cinemas;
+    }
+    
 }

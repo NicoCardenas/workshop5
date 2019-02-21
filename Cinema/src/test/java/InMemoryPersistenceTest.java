@@ -2,6 +2,7 @@
 import edu.eci.arsw.cinema.model.Cinema;
 import edu.eci.arsw.cinema.model.CinemaFunction;
 import edu.eci.arsw.cinema.model.Movie;
+import edu.eci.arsw.cinema.persistence.CinemaException;
 import edu.eci.arsw.cinema.persistence.CinemaPersistenceException;
 import edu.eci.arsw.cinema.persistence.impl.InMemoryCinemaPersistence;
 import java.util.ArrayList;
@@ -62,8 +63,8 @@ public class InMemoryPersistenceTest {
         List<CinemaFunction> functions2= new ArrayList<>();
         CinemaFunction funct12 = new CinemaFunction(new Movie("SuperHeroes Movie 3","Action"),functionDate);
         CinemaFunction funct22 = new CinemaFunction(new Movie("The Night 3","Horror"),functionDate);
-        functions.add(funct12);
-        functions.add(funct22);
+        functions2.add(funct12);
+        functions2.add(funct22);
         Cinema c2=new Cinema("Movies Bogotá",functions2);
         try{
             ipct.saveCinema(c2);
@@ -71,8 +72,79 @@ public class InMemoryPersistenceTest {
         }
         catch (CinemaPersistenceException ex){
             
-        }
-                
+        }        
+    }
+    
+    @Test
+    public void BuyTicketTest() {
+        InMemoryCinemaPersistence ipct=new InMemoryCinemaPersistence();
         
+        String functionDate = "2018-12-18 15:30";
+        List<CinemaFunction> functions= new ArrayList<>();
+        CinemaFunction funct1 = new CinemaFunction(new Movie("SuperHeroes Movie 2","Action"),functionDate);
+        CinemaFunction funct2 = new CinemaFunction(new Movie("The Night 2","Horror"),functionDate);
+        functions.add(funct1);
+        functions.add(funct2);
+        Cinema c=new Cinema("Movies Bogotá",functions);
+        try {
+            ipct.saveCinema(c);
+        } catch (CinemaPersistenceException ex) {
+            fail("Cinema persistence failed inserting the first cinema.");
+        }
+        
+        try {
+            ipct.buyTicket(0, 0, c.getName(), functionDate, "The Night 2");
+        } catch (CinemaException e) {
+            fail("Can't buy the ticket.");
+        }
+        
+        try {
+            ipct.buyTicket(0, 0, c.getName(), functionDate, "The Night 2");
+            fail("The tickets of funcion is already taken");
+        } catch (CinemaException e) {
+            
+        }
+    }
+    
+    @Test
+    public void getCinemaByNameTest() throws CinemaPersistenceException {
+        InMemoryCinemaPersistence ipct=new InMemoryCinemaPersistence();
+        
+        String functionDate = "2018-12-18 15:30";
+        List<CinemaFunction> functions= new ArrayList<>();
+        CinemaFunction funct1 = new CinemaFunction(new Movie("SuperHeroes Movie 2","Action"),functionDate);
+        CinemaFunction funct2 = new CinemaFunction(new Movie("The Night 2","Horror"),functionDate);
+        functions.add(funct1);
+        functions.add(funct2);
+        Cinema c=new Cinema("Movies Bogotá",functions);
+        try {
+            ipct.saveCinema(c);
+        } catch (CinemaPersistenceException ex) {
+            fail("Cinema persistence failed inserting the first cinema.");
+        }
+        
+        assertNotNull(ipct.getCinema(c.getName()));
+    }
+    
+    @Test
+    public void getFunctionsbyCinemaAndDateTest(){
+        InMemoryCinemaPersistence ipct=new InMemoryCinemaPersistence();
+        
+        String functionDate = "2018-12-18 15:30";
+        List<CinemaFunction> functions= new ArrayList<>();
+        CinemaFunction funct1 = new CinemaFunction(new Movie("SuperHeroes Movie 2","Action"),functionDate);
+        CinemaFunction funct2 = new CinemaFunction(new Movie("The Night 2","Horror"),functionDate);
+        functions.add(funct1);
+        functions.add(funct2);
+        Cinema c=new Cinema("Movies Bogotá",functions);
+        try {
+            ipct.saveCinema(c);
+        } catch (CinemaPersistenceException ex) {
+            fail("Cinema persistence failed inserting the first cinema.");
+        }
+        
+        assertNotNull(ipct.getFunctionsbyCinemaAndDate(c.getName(), functionDate));
+        assertEquals(ipct.getFunctionsbyCinemaAndDate(c.getName(), functionDate).get(0), funct1);
+        assertEquals(ipct.getFunctionsbyCinemaAndDate(c.getName(), functionDate).get(1), funct2);
     }
 }
