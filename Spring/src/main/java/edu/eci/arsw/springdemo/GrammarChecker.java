@@ -3,9 +3,10 @@ package edu.eci.arsw.springdemo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
+@Service
 public class GrammarChecker {
 
+        @Autowired
 	SpellChecker sc;
 
 	String x;
@@ -14,7 +15,8 @@ public class GrammarChecker {
 	public SpellChecker getSpellChecker() {
 		return sc;
 	}
-
+        
+        @Autowired
 	public void setSpellChecker(SpellChecker sc) {
 		this.sc = sc;
 	}
@@ -23,7 +25,7 @@ public class GrammarChecker {
 	public String check(String text){
 		
 		StringBuffer sb=new StringBuffer();
-		sb.append("Spell checking output:"+sc.checkSpell(text));
+		sb.append("Spell checking output: "+sc.checkSpell(text));
 		sb.append("Plagiarism checking output: Not available yet");
 		
 		
